@@ -46,13 +46,29 @@ app.get("/api/health", (req, res) => {
 });
 
 // 2. Fetch All Products (with variations later)
+// 2. Fetch All Products with their primary image
 app.get("/api/products", (req, res) => {
-  // A simple query to get our core products
-  const query = "SELECT * FROM products";
+  // This query joins the product with its first available variation image
+  const query = `
+        SELECT 
+            p.id, 
+            p.name, 
+            p.base_price AS price, 
+            p.is_new_arrival AS isNew,
+            (SELECT image_url FROM product_variations pv WHERE pv.product_id = p.id LIMIT 1) AS image,
+            CASE p.category_id 
+                WHEN 1 THEN 'Bridal'
+                WHEN 2 THEN 'Heels'
+                WHEN 3 THEN 'Office Wear'
+                WHEN 4 THEN 'Party Wear'
+                ELSE 'Collection'
+            END as category
+        FROM products p
+    `;
 
   db.query(query, (err, results) => {
     if (err) {
-      console.error(err);
+      console.error("Database query error:", err);
       return res.status(500).json({ error: "Failed to fetch products" });
     }
     res.status(200).json(results);

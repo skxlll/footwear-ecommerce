@@ -1,27 +1,49 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500&display=swap");
 
+/* --- Define the Soft Palette based on the new design --- */
 :root {
-  --bg-soft: #fdfbf9;
-  --text-main: #2c2c2c;
-  --text-light: #666666;
-  --accent-soft: #e6beae;
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --shadow-premium: 0 8px 32px rgba(0, 0, 0, 0.04);
+  /* Palette from user (image_0.png) */
+  --palette-beige: #f5e6dc;
+  --palette-peach: #ebc9a9;
+  --palette-blue: #d4e0de;
+  --palette-rose: #ecced2;
+  --palette-sage: #e2e8df;
+
+  /* Usage Mapping from image_2.png design */
+  --bg-site: var(--palette-beige);
+  --text-main: #2c2c2c; /* Soft Charcoal for premium feel */
+  --text-blue: #6a868b; /* Softened blue subtext/price */
+  --accent-action: var(--palette-peach);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --shadow-premium: 0 10px 40px rgba(0, 0, 0, 0.05);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent; /* Removes blue tap highlight on mobile */
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: var(--bg-soft);
+  background-color: var(--bg-site);
+  /* The Fix: Ambient glowing orbs using the color palette */
+  background-image:
+    radial-gradient(circle at 15% 10%, var(--palette-blue) 0%, transparent 40%),
+    radial-gradient(
+      circle at 85% 20%,
+      var(--palette-peach) 0%,
+      transparent 45%
+    ),
+    radial-gradient(circle at 50% 80%, var(--palette-rose) 0%, transparent 50%);
+  background-attachment: fixed; /* Keeps the gradient stable while scrolling */
+  background-size: cover;
+
   color: var(--text-main);
   font-family: "Inter", sans-serif;
   overflow-x: hidden;
+  line-height: 1.5;
 }
 
 h1,
@@ -32,17 +54,26 @@ h4,
   font-family: "Playfair Display", serif;
 }
 
-/* Utility classes for quick layout */
+/* Glassmorphism Panel Utility */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
+  background: rgba(
+    255,
+    255,
+    255,
+    0.45
+  ); /* Lowered opacity to let background bleed through */
+  backdrop-filter: blur(16px); /* Increased blur radius */
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6); /* Sharper highlight on the border */
+  border-right: 1px solid rgba(255, 255, 255, 0.2); /* Creates a 3D light-catching effect */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05); /* Subtly tinted shadow */
 }
 
+/* Main Container - Strict Mobile-First padding rules */
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px; /* Slightly wider for the asymmetrical design */
   margin: 0 auto;
-  padding: 0 20px; /* Ample mobile breathing room */
+  padding: 0 24px; /* Ample mobile breathing room */
 }
