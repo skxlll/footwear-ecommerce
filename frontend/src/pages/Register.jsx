@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { Loader2 } from "lucide-react";
 
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,28 +13,28 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5001/api/auth/login", {
+      const response = await fetch("http://localhost:5001/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.error || "Registration failed");
       }
 
-      // Save to global context
+      // Auto-login the user after successful registration
       login(data.user, data.token);
 
-      // Redirect back to home
+      // Redirect to home
       navigate("/");
     } catch (err) {
       setError(err.message);
@@ -65,7 +66,7 @@ const Login = () => {
           className="serif-font"
           style={{ textAlign: "center", marginBottom: "10px" }}
         >
-          Welcome Back
+          Join Aura
         </h2>
         <p
           style={{
@@ -75,7 +76,7 @@ const Login = () => {
             marginBottom: "30px",
           }}
         >
-          Sign in to access your Aura account.
+          Create an account for a premium shopping experience.
         </p>
 
         {error && (
@@ -95,9 +96,36 @@ const Login = () => {
         )}
 
         <form
-          onSubmit={handleLogin}
+          onSubmit={handleRegister}
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
+          <div>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.85rem",
+                marginBottom: "8px",
+                color: "var(--text-main)",
+              }}
+            >
+              Full Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "6px",
+                border: "1px solid var(--glass-border)",
+                background: "rgba(255, 255, 255, 0.5)",
+                outline: "none",
+              }}
+            />
+          </div>
+
           <div>
             <label
               style={{
@@ -172,10 +200,12 @@ const Login = () => {
             {loading ? (
               <Loader2 size={20} className="animate-spin" />
             ) : (
-              "Sign In"
+              "Create Account"
             )}
           </button>
         </form>
+
+        {/* Link back to Login */}
         <p
           style={{
             textAlign: "center",
@@ -184,16 +214,16 @@ const Login = () => {
             color: "var(--text-light)",
           }}
         >
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <Link
-            to="/register"
+            to="/login"
             style={{
               color: "var(--accent-action)",
               fontWeight: "600",
               textDecoration: "none",
             }}
           >
-            Create one
+            Sign In
           </Link>
         </p>
       </div>
@@ -201,4 +231,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

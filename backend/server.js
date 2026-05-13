@@ -77,6 +77,53 @@ app.get("/api/products", (req, res) => {
   });
 });
 
+// Registration Endpoint
+app.post("/api/auth/register", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  // 1. Basic validation
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    // 2. Hash the password (10 salt rounds is the industry standard)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 3. Insert into the database
+    const query =
+      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
+
+    db.query(query, [name, email, hashedPassword, "user"], (err, results) => {
+      if (err) {
+        // Handle duplicate email error (MySQL error code 1062)
+        if (err.code === "ER_DUP_ENTRY") {
+          return res.status(409).json({ error: "Email is already registered" });
+        }
+        console.error(err);
+        return res
+          .status(500)
+          .json({ error: "Database error during registration" });
+      }
+
+      // 4. Automatically log the user in by generating a token immediately
+      const token = jwt.sign(
+        { id: results.insertId, role: "user", name: name },
+        process.env.JWT_SECRET || "fallback_super_secret_key",
+        { expiresIn: "1d" },
+      );
+
+      res.status(201).json({
+        message: "Account created successfully",
+        token,
+        user: { id: results.insertId, name, email, role: "user" },
+      });
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Server error during password hashing" });
+  }
+});
+
 // Login Endpoint
 app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
@@ -90,11 +137,8 @@ app.post("/api/auth/login", async (req, res) => {
 
     const user = results[0];
 
-    // 2. FOR TESTING ONLY: Bypass bcrypt temporarily if using dummy DB data
-    // In production, you MUST use: const match = await bcrypt.compare(password, user.password);
-    const match =
-      (password === "admin123" && user.email === "admin@aura.com") ||
-      (password === "user123" && user.email === "jane@example.com");
+    // 2. REAL AUTHENTICATION: Compare the typed password with the hashed database password
+    const match = await bcrypt.compare(password, user.password);
 
     if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
@@ -118,7 +162,6 @@ app.post("/api/auth/login", async (req, res) => {
     });
   });
 });
-
 // ---------------------------------------------------------
 // START SERVER
 // ---------------------------------------------------------
