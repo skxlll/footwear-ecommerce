@@ -1,8 +1,19 @@
-import React from "react";
-import { ShoppingBag, Menu, Search, User } from "lucide-react";
-import "./Navbar.css"; // We will create this next
+import React, { useContext } from "react";
+import {
+  ShoppingBag,
+  Menu,
+  Search,
+  User,
+  Settings,
+  LogOut,
+} from "lucide-react"; // Added Settings & LogOut
+import "./Navbar.css";
+import { AuthContext } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
+  const { user, logout } = useContext(AuthContext); // Pull user state
+
   return (
     <header className="navbar glass-panel">
       <div className="container nav-container">
@@ -37,13 +48,47 @@ const Navbar = () => {
           <button className="icon-btn hidden-mobile" aria-label="Search">
             <Search size={22} strokeWidth={1.5} />
           </button>
-          <button className="icon-btn hidden-mobile" aria-label="Account">
-            <User size={22} strokeWidth={1.5} />
-          </button>
+
+          {/* Dynamic User Greeting */}
+          {user ? (
+            <div
+              className="user-greeting hidden-mobile"
+              style={{ fontSize: "0.85rem", color: "var(--text-light)" }}
+            >
+              Hi, {user.name.split(" ")[0]}
+            </div>
+          ) : null}
+
+          {/* User / Login Trigger */}
+          <Link to="/login" style={{ textDecoration: "none" }}>
+            <button className="icon-btn" aria-label="Account">
+              <User size={22} strokeWidth={1.5} />
+            </button>
+          </Link>
+
+          {/* Cart Icon */}
           <button className="icon-btn cart-btn" aria-label="Cart">
             <ShoppingBag size={22} strokeWidth={1.5} />
             <span className="cart-badge">0</span>
           </button>
+
+          {/* DYNAMIC ADMIN ICON - Renders only if user is logged in AND is an admin */}
+          {user && user.role === "admin" && (
+            <button
+              className="icon-btn admin-btn"
+              aria-label="Admin Panel"
+              style={{ color: "var(--accent-action)" }}
+            >
+              <Settings size={22} strokeWidth={1.5} />
+            </button>
+          )}
+
+          {/* Temporary Logout Button for Testing */}
+          {user && (
+            <button className="icon-btn" aria-label="Logout" onClick={logout}>
+              <LogOut size={20} strokeWidth={1.5} />
+            </button>
+          )}
         </div>
       </div>
     </header>

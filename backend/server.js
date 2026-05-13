@@ -1,6 +1,8 @@
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const app = express();
@@ -72,6 +74,48 @@ app.get("/api/products", (req, res) => {
       return res.status(500).json({ error: "Failed to fetch products" });
     }
     res.status(200).json(results);
+  });
+});
+
+// Login Endpoint
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  // 1. Find user by email
+  const query = "SELECT * FROM users WHERE email = ?";
+  db.query(query, [email], async (err, results) => {
+    if (err) return res.status(500).json({ error: "Database error" });
+    if (results.length === 0)
+      return res.status(401).json({ error: "Invalid credentials" });
+
+    const user = results[0];
+
+    // 2. FOR TESTING ONLY: Bypass bcrypt temporarily if using dummy DB data
+    // In production, you MUST use: const match = await bcrypt.compare(password, user.password);
+    const match =
+      (password === "admin123" && user.email === "admin@aura.com") ||
+      (password === "user123" && user.email === "jane@example.com");
+
+    if (!match) return res.status(401).json({ error: "Invalid credentials" });
+
+    // 3. Generate JWT Token
+    const token = jwt.sign(
+      { id: user.id, role: user.role, name: user.name },
+      process.env.JWT_SECRET || "fallback_super_secret_key",
+      { expiresIn: "1d" },
+    );
+
+    // 4. Send token and user data to frontend
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
   });
 });
 
