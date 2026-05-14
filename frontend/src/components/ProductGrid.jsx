@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { SlidersHorizontal, Loader2 } from "lucide-react";
+import { motion } from "framer-motion"; // <-- Import motion
 import ProductCard from "./ProductCard";
 import "./ProductGrid.css";
+
+// Define the staggered cascade rules
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15, // Delay each card by 0.15s
+      delayChildren: 0.2, // Wait slightly before starting
+    },
+  },
+};
 
 const ProductGrid = () => {
   const [products, setProducts] = useState([]);
@@ -32,12 +45,17 @@ const ProductGrid = () => {
   return (
     <section className="product-section">
       <div className="container">
-        <div className="section-header">
+        {/* Animate the Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="section-header"
+        >
           <h2 className="serif-font">The Collection</h2>
           <p className="subtitle">Discover our latest arrivals</p>
-        </div>
+        </motion.div>
 
-        {/* Loading & Error States */}
         {loading && (
           <div
             style={{
@@ -55,23 +73,24 @@ const ProductGrid = () => {
         )}
 
         {error && (
-          <div
-            style={{ textAlign: "center", color: "#d9534f", padding: "20px" }}
-          >
-            <p>Connection Error: Make sure your backend is running.</p>
-          </div>
+          <div style={{ textAlign: "center", color: "#d9534f" }}>{error}</div>
         )}
 
-        {/* Live CSS Grid */}
+        {/* Live CSS Grid with Staggered Animation */}
         {!loading && !error && (
-          <div className="grid-container">
+          <motion.div
+            className="grid-container"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+          >
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
-          </div>
+          </motion.div>
         )}
 
-        {/* Mobile Sticky Filter Button */}
+        {/* Mobile Sticky Filter */}
         <div className="mobile-filter-container">
           <button className="filter-btn glass-panel">
             <SlidersHorizontal size={18} />

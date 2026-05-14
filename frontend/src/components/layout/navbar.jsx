@@ -24,7 +24,9 @@ const Navbar = () => {
 
         {/* Brand Logo */}
         <div className="brand">
-          <h1 className="serif-font">Aura.</h1>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <h1 className="serif-font">Aura.</h1>
+          </Link>
         </div>
 
         {/* Desktop Navigation (Hidden on Mobile) */}

@@ -28,7 +28,6 @@
 
 body {
   background-color: var(--bg-site);
-  /* The Fix: Ambient glowing orbs using the color palette */
   background-image:
     radial-gradient(circle at 15% 10%, var(--palette-blue) 0%, transparent 40%),
     radial-gradient(
@@ -37,13 +36,27 @@ body {
       transparent 45%
     ),
     radial-gradient(circle at 50% 80%, var(--palette-rose) 0%, transparent 50%);
-  background-attachment: fixed; /* Keeps the gradient stable while scrolling */
-  background-size: cover;
+  background-attachment: fixed;
+  background-size: 200% 200%; /* Make the background larger so it can move */
+  animation: ambientMesh 15s ease-in-out infinite alternate; /* The breathing effect */
 
   color: var(--text-main);
   font-family: "Inter", sans-serif;
   overflow-x: hidden;
   line-height: 1.5;
+}
+
+/* Add this to the bottom of the file */
+@keyframes ambientMesh {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
 }
 
 h1,

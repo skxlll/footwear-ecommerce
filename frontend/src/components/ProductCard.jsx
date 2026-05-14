@@ -1,21 +1,33 @@
 import React from "react";
 import { Plus } from "lucide-react";
-import "./ProductGrid.css"; // We will create this combined CSS file next
+import { motion } from "framer-motion";
+import "./ProductGrid.css";
+
+// The animation properties for an individual card
+const itemVariants = {
+  hidden: { opacity: 0, y: 40 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: [0.16, 1, 0.3, 1], // A custom premium "ease-out" curve
+    },
+  },
+};
 
 const ProductCard = ({ product }) => {
   return (
-    <div className="product-card">
+    <motion.div variants={itemVariants} className="product-card">
       <div className="image-container">
-        {/* Placeholder premium shoe images from Unsplash */}
         <img src={product.image} alt={product.name} loading="lazy" />
 
-        {/* Badges for New Arrival / Sale */}
-        {product.isNew && <span className="badge new-badge">New</span>}
-        {product.isSale && <span className="badge sale-badge">Sale</span>}
+        {/* Badges */}
+        {product.isNew ? <span className="badge new-badge">New</span> : null}
 
-        {/* Quick Add Button (Mobile Friendly Touch Target) */}
+        {/* Quick Add Button - Now hidden by default via CSS */}
         <button className="quick-add-btn glass-panel" aria-label="Quick Add">
-          <Plus size={20} />
+          <Plus size={20} strokeWidth={1.5} />
         </button>
       </div>
 
@@ -24,7 +36,7 @@ const ProductCard = ({ product }) => {
         <h3 className="product-name serif-font">{product.name}</h3>
         <p className="product-price">Rs. {product.price}</p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
