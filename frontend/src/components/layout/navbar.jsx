@@ -10,12 +10,24 @@ import {
 import "./Navbar.css";
 import { AuthContext } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext); // Pull user state
 
   return (
-    <header className="navbar glass-panel">
+    <motion.header
+      className="navbar glass-panel"
+      initial={{
+        y: -100,
+        opacity: 0,
+      }} /* Start above the screen and invisible */
+      animate={{ y: 0, opacity: 1 }} /* Slide down to normal position */
+      transition={{
+        duration: 1.0,
+        ease: [0.16, 1, 0.3, 1],
+      }} /* Premium easing curve */
+    >
       <div className="container nav-container">
         {/* Mobile Menu Icon */}
         <button className="icon-btn mobile-only" aria-label="Open Menu">
@@ -93,7 +105,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 };
 

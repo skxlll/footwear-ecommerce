@@ -10,8 +10,8 @@ const containerVariants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15, // Delay each card by 0.15s
-      delayChildren: 0.2, // Wait slightly before starting
+      staggerChildren: 0.25, // Delay each card by 0.15s
+      delayChildren: 0.4, // Wait slightly before starting
     },
   },
 };
