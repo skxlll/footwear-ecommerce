@@ -77,6 +77,55 @@ app.get("/api/products", (req, res) => {
   });
 });
 
+// Single product with all variation images
+app.get("/api/products/:id", (req, res) => {
+  const { id } = req.params;
+  const productQuery = `
+        SELECT 
+            p.id, 
+            p.name, 
+            p.description,
+            p.base_price AS price, 
+            p.is_new_arrival AS isNew,
+            CASE p.category_id 
+                WHEN 1 THEN 'Bridal'
+                WHEN 2 THEN 'Heels'
+                WHEN 3 THEN 'Office Wear'
+                WHEN 4 THEN 'Party Wear'
+                ELSE 'Collection'
+            END as category
+        FROM products p
+        WHERE p.id = ?
+    `;
+
+  db.query(productQuery, [id], (err, results) => {
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({ error: "Failed to fetch product" });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const product = results[0];
+    const imagesQuery =
+      "SELECT image_url FROM product_variations WHERE product_id = ?";
+
+    db.query(imagesQuery, [id], (imgErr, images) => {
+      if (imgErr) {
+        console.error("Images query error:", imgErr);
+        return res.status(500).json({ error: "Failed to fetch product images" });
+      }
+
+      const imageUrls = images.map((row) => row.image_url).filter(Boolean);
+      product.images = imageUrls;
+      product.image = imageUrls[0] || null;
+
+      res.status(200).json(product);
+    });
+  });
+});
+
 // Registration Endpoint
 app.post("/api/auth/register", async (req, res) => {
   const { name, email, password } = req.body;

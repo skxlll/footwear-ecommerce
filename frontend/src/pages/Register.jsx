@@ -1,7 +1,11 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
+import Footer from "../components/layout/Footer";
+import { easeLuxury } from "../lib/motion";
+import { API_BASE } from "../lib/api";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -9,7 +13,6 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -17,24 +20,15 @@ const Register = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      const response = await fetch("http://localhost:5001/api/auth/register", {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Registration failed");
-      }
-
-      // Auto-login the user after successful registration
+      if (!response.ok) throw new Error(data.error || "Registration failed");
       login(data.user, data.token);
-
-      // Redirect to home
       navigate("/");
     } catch (err) {
       setError(err.message);
@@ -44,190 +38,120 @@ const Register = () => {
   };
 
   return (
-    <div
-      className="container"
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "60vh",
-      }}
-    >
-      <div
-        className="glass-panel"
-        style={{
-          padding: "40px",
-          width: "100%",
-          maxWidth: "400px",
-          borderRadius: "12px",
-        }}
-      >
-        <h2
-          className="serif-font"
-          style={{ textAlign: "center", marginBottom: "10px" }}
+    <>
+      <div className="min-h-[calc(100svh-4.25rem)] pt-24 pb-16 lg:grid lg:grid-cols-2 lg:pt-0">
+        <motion.div
+          className="relative hidden overflow-hidden lg:order-2 lg:block"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.9, ease: easeLuxury }}
         >
-          Join Aura
-        </h2>
-        <p
-          style={{
-            textAlign: "center",
-            color: "var(--text-light)",
-            fontSize: "0.9rem",
-            marginBottom: "30px",
-          }}
-        >
-          Create an account for a premium shopping experience.
-        </p>
+          <img
+            src="https://images.unsplash.com/photo-1515347619252-60a4bf4f0ccd?w=1200&q=85"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-blush/40 to-transparent" />
+          <div className="relative flex h-full flex-col justify-end p-16">
+            <span className="label-caps text-charcoal/80">Join Aura</span>
+            <h2 className="font-display mt-4 max-w-md text-4xl leading-tight font-medium text-charcoal">
+              Step into a world of <span className="italic text-accent-deep">refined</span> style
+            </h2>
+          </div>
+        </motion.div>
 
-        {error && (
-          <div
-            style={{
-              backgroundColor: "rgba(255, 0, 0, 0.1)",
-              color: "red",
-              padding: "10px",
-              borderRadius: "6px",
-              marginBottom: "20px",
-              fontSize: "0.85rem",
-              textAlign: "center",
-            }}
+        <div className="container-luxury flex items-center justify-center py-8 lg:order-1 lg:py-24">
+          <motion.div
+            className="w-full max-w-md"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: easeLuxury }}
           >
-            {error}
-          </div>
-        )}
+            <div className="glass rounded-[2rem] p-8 sm:p-10">
+              <span className="label-caps">New member</span>
+              <h1 className="font-display mt-3 text-3xl font-medium">Create account</h1>
+              <p className="mt-2 text-sm text-stone">
+                Your premium shopping experience starts here.
+              </p>
 
-        <form
-          onSubmit={handleRegister}
-          style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-        >
-          <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.85rem",
-                marginBottom: "8px",
-                color: "var(--text-main)",
-              }}
-            >
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "6px",
-                border: "1px solid var(--glass-border)",
-                background: "rgba(255, 255, 255, 0.5)",
-                outline: "none",
-              }}
-            />
-          </div>
+              {error && (
+                <div className="mt-6 rounded-2xl border border-red-200/60 bg-red-50/80 px-4 py-3 text-center text-sm text-red-700">
+                  {error}
+                </div>
+              )}
 
-          <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.85rem",
-                marginBottom: "8px",
-                color: "var(--text-main)",
-              }}
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "6px",
-                border: "1px solid var(--glass-border)",
-                background: "rgba(255, 255, 255, 0.5)",
-                outline: "none",
-              }}
-            />
-          </div>
+              <form onSubmit={handleRegister} className="mt-8 space-y-5">
+                <div>
+                  <label className="mb-2 block text-xs font-medium tracking-wider text-muted uppercase">
+                    Full name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="input-luxury"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs font-medium tracking-wider text-muted uppercase">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="input-luxury"
+                    placeholder="you@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs font-medium tracking-wider text-muted uppercase">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="input-luxury"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary mt-2 w-full"
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : (
+                    <>
+                      Create Account
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </motion.button>
+              </form>
 
-          <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.85rem",
-                marginBottom: "8px",
-                color: "var(--text-main)",
-              }}
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "6px",
-                border: "1px solid var(--glass-border)",
-                background: "rgba(255, 255, 255, 0.5)",
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              backgroundColor: "var(--accent-action)",
-              color: "#fff",
-              padding: "14px",
-              border: "none",
-              borderRadius: "30px",
-              fontWeight: "600",
-              cursor: "pointer",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: "10px",
-            }}
-          >
-            {loading ? (
-              <Loader2 size={20} className="animate-spin" />
-            ) : (
-              "Create Account"
-            )}
-          </button>
-        </form>
-
-        {/* Link back to Login */}
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "20px",
-            fontSize: "0.85rem",
-            color: "var(--text-light)",
-          }}
-        >
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            style={{
-              color: "var(--accent-action)",
-              fontWeight: "600",
-              textDecoration: "none",
-            }}
-          >
-            Sign In
-          </Link>
-        </p>
+              <p className="mt-8 text-center text-sm text-stone">
+                Already a member?{" "}
+                <Link
+                  to="/login"
+                  className="font-medium text-accent-deep hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

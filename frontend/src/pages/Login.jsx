@@ -1,14 +1,17 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
+import Footer from "../components/layout/Footer";
+import { easeLuxury } from "../lib/motion";
+import { API_BASE } from "../lib/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -16,24 +19,15 @@ const Login = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      const response = await fetch("http://localhost:5001/api/auth/login", {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      // Save to global context
+      if (!response.ok) throw new Error(data.error || "Login failed");
       login(data.user, data.token);
-
-      // Redirect back to home
       navigate("/");
     } catch (err) {
       setError(err.message);
@@ -43,161 +37,107 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="container"
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "60vh",
-      }}
-    >
-      <div
-        className="glass-panel"
-        style={{
-          padding: "40px",
-          width: "100%",
-          maxWidth: "400px",
-          borderRadius: "12px",
-        }}
-      >
-        <h2
-          className="serif-font"
-          style={{ textAlign: "center", marginBottom: "10px" }}
+    <>
+      <div className="min-h-[calc(100svh-4.25rem)] pt-24 pb-16 lg:grid lg:grid-cols-2 lg:pt-0">
+        <motion.div
+          className="relative hidden overflow-hidden lg:block"
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.9, ease: easeLuxury }}
         >
-          Welcome Back
-        </h2>
-        <p
-          style={{
-            textAlign: "center",
-            color: "var(--text-light)",
-            fontSize: "0.9rem",
-            marginBottom: "30px",
-          }}
-        >
-          Sign in to access your Aura account.
-        </p>
-
-        {error && (
-          <div
-            style={{
-              backgroundColor: "rgba(255, 0, 0, 0.1)",
-              color: "red",
-              padding: "10px",
-              borderRadius: "6px",
-              marginBottom: "20px",
-              fontSize: "0.85rem",
-              textAlign: "center",
-            }}
-          >
-            {error}
+          <img
+            src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=1200&q=85"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-blush/40 to-transparent" />
+          <div className="relative flex h-full flex-col justify-end p-16">
+            <span className="label-caps text-charcoal/80">Aura Members</span>
+            <h2 className="font-display mt-4 max-w-md text-4xl leading-tight font-medium text-charcoal">
+              Your wardrobe, <span className="italic text-accent-deep">curated</span>
+            </h2>
           </div>
-        )}
+        </motion.div>
 
-        <form
-          onSubmit={handleLogin}
-          style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-        >
-          <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.85rem",
-                marginBottom: "8px",
-                color: "var(--text-main)",
-              }}
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "6px",
-                border: "1px solid var(--glass-border)",
-                background: "rgba(255, 255, 255, 0.5)",
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <div>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.85rem",
-                marginBottom: "8px",
-                color: "var(--text-main)",
-              }}
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "6px",
-                border: "1px solid var(--glass-border)",
-                background: "rgba(255, 255, 255, 0.5)",
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              backgroundColor: "var(--accent-action)",
-              color: "#fff",
-              padding: "14px",
-              border: "none",
-              borderRadius: "30px",
-              fontWeight: "600",
-              cursor: "pointer",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: "10px",
-            }}
+        <div className="container-luxury flex items-center justify-center py-8 lg:py-24">
+          <motion.div
+            className="w-full max-w-md"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: easeLuxury }}
           >
-            {loading ? (
-              <Loader2 size={20} className="animate-spin" />
-            ) : (
-              "Sign In"
-            )}
-          </button>
-        </form>
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: "20px",
-            fontSize: "0.85rem",
-            color: "var(--text-light)",
-          }}
-        >
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            style={{
-              color: "var(--accent-action)",
-              fontWeight: "600",
-              textDecoration: "none",
-            }}
-          >
-            Create one
-          </Link>
-        </p>
+            <div className="glass rounded-[2rem] p-8 sm:p-10">
+              <span className="label-caps">Welcome back</span>
+              <h1 className="font-display mt-3 text-3xl font-medium">Sign in</h1>
+              <p className="mt-2 text-sm text-stone">
+                Access your Aura account and saved favourites.
+              </p>
+
+              {error && (
+                <div className="mt-6 rounded-2xl border border-red-200/60 bg-red-50/80 px-4 py-3 text-center text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleLogin} className="mt-8 space-y-5">
+                <div>
+                  <label className="mb-2 block text-xs font-medium tracking-wider text-muted uppercase">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="input-luxury"
+                    placeholder="you@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-xs font-medium tracking-wider text-muted uppercase">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="input-luxury"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-primary mt-2 w-full"
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </motion.button>
+              </form>
+
+              <p className="mt-8 text-center text-sm text-stone">
+                New to Aura?{" "}
+                <Link
+                  to="/register"
+                  className="font-medium text-accent-deep hover:underline"
+                >
+                  Create an account
+                </Link>
+              </p>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

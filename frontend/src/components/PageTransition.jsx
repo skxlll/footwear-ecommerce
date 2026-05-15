@@ -1,17 +1,8 @@
-import React from "react";
 import { motion } from "framer-motion";
+import { pageTransition } from "../lib/motion";
 
-const PageTransition = ({ children }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }} /* Start slightly faded and low */
-      animate={{ opacity: 1, y: 0 }} /* Slide up and fade in */
-      exit={{ opacity: 0, y: -20 }} /* Slide up and fade out when leaving */
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-};
+const PageTransition = ({ children }) => (
+  <motion.div {...pageTransition}>{children}</motion.div>
+);
 
 export default PageTransition;
